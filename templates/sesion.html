@@ -1,0 +1,75 @@
+{% extends './layout.html' %}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+{% block title %}{{datas.titulo}} {{datas.id_user}}{% endblock %}
+{% block body %}
+    <h1 class="text-center my-4 display-4">HOLA {{datas.nombre}} , Bienvenida</h1>
+<h2>Estas son las partidas que tienes registradas actualmente:</h2>
+<table class="table tablaSesion">
+  <thead>
+    <tr>
+      {% for encabezado in encabezados %}
+        <th>{{ encabezado }}</th>
+      {% endfor %}
+  </thead>
+  </tr>
+  <tbody>
+    {% for fila in datos %}
+      <tr>
+        {% for columna in fila %}
+          <td>{{ columna }}</td>
+        {% endfor %}
+        <td>
+      <td><a href="{{ url_for('juego', id=fila[0], user=datas.id_user) }}" class="btn btn-dark">Ir a la sesión de juego</a></td>
+
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <fieldset>
+                <legend>Crear Sesión</legend>
+                <form method="POST" id="miFormulario">
+                    <label for="newname">Nombre :</label>
+                    <input type="hidden" id="formulario" name="formulario" value="crear" autocomplete="off">
+                    <input type="text" id="newname" name="newname" placeholder="nombre de sesion"><br><br>
+                    <label for="newpassword">Contraseña:</label>
+                    <input type="password" id="newpassword" name="newpassword" placeholder="contraseña de la sesión"><br><br>
+                    <input type="submit" value="Crear" onclick="location.reload()" class="btn btn-dark">
+                </form>
+            </fieldset>
+        </div>
+        <div class="col-lg-6">
+            <fieldset>
+                <legend>Login Sesión</legend>
+                <form method="POST" id="miFormulario2">
+                    <label for="name">Nombre :</label>
+                    <input type="hidden" name="formulario" value="login" autocomplete="off">
+                    <input type="text" id="name" name="name" placeholder="nombre de la sesión"><br><br>
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" placeholder="contraseña de la sesión"><br><br>
+                    <input type="submit" value="Entrar" onclick="location.reload()" class="btn btn-dark">
+                </form>
+            </fieldset>
+        </div>
+    </div>
+</div>
+
+{% if confirmacion %}
+    <div>{{ confirmacion }}</div>
+{% endif %}
+<script>
+function recargarPagina() {
+  // agregar evento de carga al botón
+  document.getElementById("miFormulario").addEventListener("submit", function() {
+    // recargar la página después de 1 segundo (1000 milisegundos)
+    setTimeout(function() {
+      location.reload();
+    }, 1000);
+  });
+}
+</script>
+
+{% endblock %}

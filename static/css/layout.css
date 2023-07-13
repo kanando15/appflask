@@ -1,0 +1,42 @@
+body{
+      background: linear-gradient(to left, #808080, #FFA500);
+}
+.table.tablaSesion,
+.table.tablaSesion th,
+.table.tablaSesion td {
+    border: 1px solid black;
+    background-color: transparent;
+}
+fieldset {
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 20px; /* Espacio entre los fieldsets */
+}
+.image-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);  /* Dos columnas con igual anchura */
+        grid-gap: 10px;  /* Espacio entre las imágenes */
+        justify-content: center;
+        width: 200px;  /* Ancho fijo del grid */
+        height: 200px;  /* Altura fija del grid */
+
+    }
+
+    .image-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid black;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+
+        box-sizing: border-box;
+    }
+
+    .image-item img {
+        padding: 0;
+        width: 100%;
+        object-fit: cover;
+    }

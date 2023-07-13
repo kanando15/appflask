@@ -1,0 +1,270 @@
+{% extends './layout.html' %}
+{% block title %}{{datas.titulo}} {% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mapa.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js"></script>
+{% endblock %}
+
+{% block body %}
+ <h2 class="text-center my-4">Bienvenido a {{datas.aventura}}</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                <div class="chat-container" style="border: 1px solid #000;">
+                    <h2>Chat</h2>
+                    <ul id="messages" class="message-list" style="height: 60vh; overflow-y: auto;"></ul>
+                    <input id="myMessage" type="text">
+                    <button id="send">Enviar</button>
+                    <div id="controls">
+                        <button id="recordButton">Grabar</button>
+                        <button id="pauseButton" disabled>Pausa</button>
+                        <button id="stopButton2" disabled>Detener</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                <div class="image-container">
+                    <h4>Imágenes</h4>
+                    <div class="image-grid">
+                        {% for ruta_imagen in rutas_imagenes %}
+                            {% if ruta_imagen %}
+                                <div class="image-item">
+                                    <img src="{{ url_for('static', filename=ruta_imagen['ruta'][7:]) }}" width="100" height="100">
+                    <!--                <p>{{ ruta_imagen['nombre'] }}</p>       --->
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="map-container">
+                    <br>
+                    <h4>Mapa</h4>
+                    <div id="grid" class="grid-container"></div>
+                    <button id="update-button">Actualizar mapa</button>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+                <div class="midi-container">
+                    <h4>Musica de fondo</h4>
+                    <midi-player id="myMidiPlayer" src="{{ '/static/melody_' + datas.id|string + '_' + datas.id_user|string + '.mid' }}" sound-font visualizer="#myVisualizer" loop></midi-player>
+                    <button id="changeButton">Cambiar Música</button>
+                </div>
+                <div class="voces-container">
+                    <h4>Lista de Voces</h4>
+                    <form id="miFormulario" method="POST">
+                        <select name="lista_voces">
+                            {% for name in voice_name %}
+                                <option>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+                <div class="audio-container">
+                    <h4>Voz del DM</h4>
+                    <audio id="audioPlayer1" controls>
+                        <source src="" type="audio/mpeg">
+                        Tu navegador no admite la reproducción de audio.
+                    </audio>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Codigo javascript -->
+
+    <script
+      src="https://code.jquery.com/jquery-3.7.0.min.js"
+      integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+      crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js"></script>
+  <script>
+     const socket = io()
+     room = {{datas.id}}
+     socket.emit('join', room);
+
+    <!--    Con esto podemos mandar un mensaje directo al servidor:  socket.emit('message', 'hello')    -->
+
+    socket.on('message', function(msg) {
+      $('#messages').append('<li>' + msg+ '</li>')
+    })
+
+   $('#send').on('click', function() {
+    const message = $('#myMessage').val();
+    var id_user = {{datas.id_user}};
+
+   var selectedVoice = $('#miFormulario select[name="lista_voces"]').val(); // Obtener el valor de voz
+
+
+    socket.emit('join', room);
+     socket.emit('message', { message: message, room: room, user:id_user, voice: selectedVoice });
+     $('#myMessage').val('');
+  });
+
+  </script>
+
+ <script>
+socket.on('audio', function(data) {
+  var now = new Date();
+  var timestamp = now.getTime();
+  var audioPlayer1 = document.getElementById('audioPlayer1');
+  var source = audioPlayer1.getElementsByTagName('source')[0];
+   source.src = "/static/output.mp3?timestamp=" + timestamp;
+  audioPlayer1.load(); // necesario para que los cambios en el atributo src tengan efecto
+  audioPlayer1.play();
+
+});
+</script>
+
+<div id="message"></div>
+        </div>
+                <div class="right">
+            <!-- Contenido de la derecha -->
+                        <div id="grid" class="grid-container"></div>
+    <script>
+        // Crear un mapa de cuadrícula 10x10
+        var grid = [];
+        for (var i = 0; i < 10; i++) {
+            grid[i] = [];
+            for (var j = 0; j < 10; j++) {
+                grid[i][j] = document.createElement('div');
+                grid[i][j].className = 'grid-item';
+                document.getElementById('grid').appendChild(grid[i][j]);
+            }
+        }
+
+        // Función para actualizar el mapa basado en las coordenadas recibidas
+        function updateMap(coordinates) {
+            // Limpiar el mapa
+            for (var i = 0; i < 10; i++) {
+                for (var j = 0; j < 10; j++) {
+                    grid[i][j].className = 'grid-item';
+                }
+            }
+
+            // Actualizar el mapa con las nuevas coordenadas
+            for (var key in coordinates) {
+                var x = coordinates[key][0]-1;
+                var y = coordinates[key][1]-1;
+                if (key == 'Jugador') {
+                    grid[y][x].className += ' player';
+                } else if (key.startsWith('Aliado')) {
+                    grid[y][x].className += ' ally';
+                } else if (key.startsWith('Enemigo')) {
+                    grid[y][x].className += ' enemy';
+                }
+            }
+        }
+
+        // Coordenadas de ejemplo
+        var coordinates = {
+            'Jugador': [3, 2],
+            'Aliado 1': [4, 5],
+            'Aliado 2': [5, 3],
+            'Enemigo 1': [6, 6],
+            'Enemigo 2': [2, 4]
+        };
+
+        // Actualizar el mapa con las coordenadas de ejemplo
+        updateMap(coordinates);
+    </script>
+
+<script>
+    // ... el resto de tu código JavaScript ...
+    var id_user = {{datas.id_user}};
+    // Cuando se haga clic en el botón, hacer una solicitud AJAX a Flask
+    $('#update-button').click(function() {
+        $.ajax({
+            url: '/juego/{id}/{user}/mapa',  // la URL de tu endpoint Flask
+            type: 'POST',
+            data: { room: room, user:id_user },
+            success: function(response) {
+                // Actualizar el mapa con las nuevas coordenadas
+                socket.emit('map-updated', { room: room, coordinates: response.coordinates });
+           },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+
+
+</script>
+
+    <script>
+        // Escuchar el evento 'map-updated' para actualizar el mapa en todos los clientes
+        socket.on('map-updated', function(coordinates) {
+            updateMap(coordinates);
+        });
+    </script>
+
+
+<!-- midi player--->
+<script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+
+
+    <script>
+    var player = document.getElementById('myMidiPlayer');
+        var changeButton = document.getElementById('changeButton');
+       changeButton.addEventListener('click', async function() {
+    // Hacer una solicitud AJAX POST para obtener la nueva música del servidor
+        await Tone.start();
+    $.ajax({
+        url: '/juego/' + {{datas.id}} + '/' + id_user + '/music',
+    type: 'POST',
+    data: JSON.stringify({ room: room }),
+    contentType: 'application/json',
+    success: function(response) {
+        var newMusicUrl = response.url;
+            player.stop();
+            player.reload();
+            setTimeout(function() {
+    player.start();  // Comienza a reproducir después de 5 segundos
+}, 5000);
+    },
+    error: function(error) {
+        console.log(error);
+    }
+});
+});
+</script>
+
+                   <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  	<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+  	<script src="/static/js/microfono.js"></script>
+
+
+<script>
+//para subir imagenes
+function uploadImage() {
+    var fileInput = document.getElementById("uploadFile");
+    var file = fileInput.files[0];
+
+    if (file) {
+        var formData = new FormData();
+        formData.append('file', file);
+
+        $.ajax({
+            url: '/juego/' + {{datas.id}} + '/' + id_user + '/imagen',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log("Imagen cargada exitosamente");
+                location.reload();  // Recarga la página
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+}
+
+</script>
+
+{% endblock %}

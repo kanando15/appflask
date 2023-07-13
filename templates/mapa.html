@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 20px);
+            grid-template-rows: repeat(10, 20px);
+        }
+        .grid-item {
+            width: 20px;
+            height: 20px;
+            border: 1px solid black;
+        }
+        .player {
+            background-image: url('../static/icons8-dungeons-and-dragons-16.png');
+        }
+        .ally {
+            background-color: green;
+        }
+        .enemy {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="grid" class="grid-container"></div>
+
+    <script>
+        // Crear un mapa de cuadrícula 10x10
+        var grid = [];
+        for (var i = 0; i < 10; i++) {
+            grid[i] = [];
+            for (var j = 0; j < 10; j++) {
+                grid[i][j] = document.createElement('div');
+                grid[i][j].className = 'grid-item';
+                document.getElementById('grid').appendChild(grid[i][j]);
+            }
+        }
+
+        // Función para actualizar el mapa basado en las coordenadas recibidas
+        function updateMap(coordinates) {
+            // Limpiar el mapa
+            for (var i = 0; i < 10; i++) {
+                for (var j = 0; j < 10; j++) {
+                    grid[i][j].className = 'grid-item';
+                }
+            }
+
+            // Actualizar el mapa con las nuevas coordenadas
+            for (var key in coordinates) {
+                var x = coordinates[key][0];
+                var y = coordinates[key][1];
+                if (key == 'Jugador') {
+                    grid[y][x].className += ' player';
+                } else if (key.startsWith('Aliado')) {
+                    grid[y][x].className += ' ally';
+                } else if (key.startsWith('Enemigo')) {
+                    grid[y][x].className += ' enemy';
+                }
+            }
+        }
+
+        // Coordenadas de ejemplo
+        var coordinates = {
+            'Jugador': [3, 2],
+            'Aliado 1': [4, 5],
+            'Aliado 2': [5, 3],
+            'Enemigo 1': [6, 6],
+            'Enemigo 2': [2, 4]
+        };
+
+        // Actualizar el mapa con las coordenadas de ejemplo
+        updateMap(coordinates);
+    </script>
+
+
+
+
+</body>
+</html>

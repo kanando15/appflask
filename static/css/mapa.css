@@ -1,0 +1,30 @@
+       .container {
+            display: flex;
+        }
+        .left, .right {
+            flex: 1;
+            padding: 10px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+        }
+        .grid-item {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+        }
+        .player {
+            background-image: url('../jugador.png');
+            background-size: cover;
+            width: 30px;
+            height: 30px;
+        }
+        .ally {
+            background-color: green;
+        }
+        .enemy {
+            background-color: red;
+        }
+

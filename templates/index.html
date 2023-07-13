@@ -1,0 +1,47 @@
+{% extends './layout.html' %}
+{% block title %}{{data.titulo}} {% endblock %}
+{% block body %}
+
+<div class="container">
+    <h1 class="text-center my-4 display-4">IA DUNGEON MASTER API</h1>
+    <div class="row">
+        <div class="col-lg-6">
+            <fieldset>
+                <legend>CREAR USUARIO</legend>
+                <form method="POST">
+                    <input type="hidden" id="formulario" name="formulario" value="crear" autocomplete="off">
+                    <div class="form-group">
+                        <label for="newname">Nombre :</label>
+                        <input type="text" id="newname" name="newname" placeholder="nombre de usuario" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="newpassword">Contraseña:</label>
+                        <input type="password" id="newpassword" name="newpassword" placeholder="contraseña del usuario" class="form-control">
+                    </div>
+                    <input type="submit" value="Crear" class="btn btn-dark">
+                </form>
+            </fieldset>
+        </div>
+        <div class="col-lg-6">
+            <fieldset>
+                <legend>LOGIN USUARIO</legend>
+                <form method="POST">
+                    <input type="hidden" name="formulario" value="login" autocomplete="off">
+                    <div class="form-group">
+                        <label for="name">Nombre :</label>
+                        <input type="text" id="name" name="name" placeholder="nombre de usuario" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" name="password" placeholder="contraseña del usuario" class="form-control">
+                    </div>
+                    <input type="submit" value="Entrar" class="btn btn-dark">
+                </form>
+            </fieldset>
+        </div>
+    </div>
+    {% if error %}
+        <div>{{ confirmacion }}</div>
+    {% endif %}
+</div>
+{% endblock %}
