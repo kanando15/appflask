@@ -3,6 +3,5 @@ openai
 flask_socketio
 pyttsx3
 mido
-ast
 speech_recognition
 glob
