@@ -1,3 +1,4 @@
+--upgrade pip
 flask
 openai
 flask_socketio
