@@ -4,4 +4,3 @@ flask_socketio
 pyttsx3
 mido
 SpeechRecognition
-glob
