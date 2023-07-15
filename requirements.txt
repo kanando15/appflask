@@ -5,3 +5,4 @@ pyttsx3
 mido
 SpeechRecognition
 gunicorn
+PyAudio
