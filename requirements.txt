@@ -2,7 +2,6 @@ flask
 openai
 flask_socketio
 pyttsx3
-json
 re
 mido
 io
