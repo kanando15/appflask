@@ -1,8 +1,7 @@
 flask
 openai
 flask_socketio
-RUN apt-get update && apt-get install -y libespeak1
-pyttsx3
+pyttsx3==2.90
 mido
 SpeechRecognition
 gunicorn
