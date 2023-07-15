@@ -1,9 +1,8 @@
 flask
 openai
 flask_socketio
-pyttsx3
+--no-deps pyttsx3
 mido
 SpeechRecognition
 gunicorn
-portaudio19
-pyaudio
+
